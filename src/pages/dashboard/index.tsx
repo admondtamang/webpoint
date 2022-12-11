@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   Thead,
@@ -9,22 +9,27 @@ import {
   Td,
   TableCaption,
   TableContainer,
+  Input,
 } from "@chakra-ui/react";
+import { trpc } from "@/utils/trpc";
 
 export default function Dashboard() {
-  const passwords = [
-    { url: "github.com", username: "hari", password: "slkfjasljlk" },
-    { url: "github.com", username: "hari", password: "slkfjasljlk" },
-    { url: "github.com", username: "hari", password: "slkfjasljlk" },
-    { url: "github.com", username: "hari", password: "slkfjasljlk" },
-    { url: "github.com", username: "hari", password: "slkfjasljlk" },
-  ];
+  const [url, setUrl] = useState("");
+  const { data, error } = trpc.user.getAll.useQuery({
+    url,
+  });
+
+  const handleChange = (e: any) => {
+    setUrl(e.target.value);
+  };
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Dashboard</h1>
+      <p className="text-red-600">{error && error?.message}</p>
+
+      <Input placeholder="Enter url" className="my-4" onChange={handleChange} />
       <TableContainer>
         <Table variant="simple">
-          <TableCaption>Imperial to metric conversion factors</TableCaption>
           <Thead>
             <Tr>
               <Th>URL</Th>
@@ -33,13 +38,14 @@ export default function Dashboard() {
             </Tr>
           </Thead>
           <Tbody>
-            {passwords.map((row, index) => (
-              <Tr key={index}>
-                <Td>{row.url}</Td>
-                <Td>{row.username}</Td>
-                <Td>{row.password}</Td>
-              </Tr>
-            ))}
+            {Array.isArray(data) &&
+              data.map((row, index) => (
+                <Tr key={index}>
+                  <Td>{row.url}</Td>
+                  <Td>{row.username}</Td>
+                  <Td>{row.password}</Td>
+                </Tr>
+              ))}
           </Tbody>
         </Table>
       </TableContainer>

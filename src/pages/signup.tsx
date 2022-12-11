@@ -1,11 +1,11 @@
 import Forms from "@/components/Forms";
+import { CreateUserInput } from "@/server/schema/user.schema";
+import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
-
+import Swal from "sweetalert2/dist/sweetalert2.js";
 type Props = {};
 
 const ProductCreateEdit = (props: Props) => {
-  const [jsonView, setjsonView] = useState({});
-  // URL, username, and a randomly generated password.
   const formFields = [
     {
       name: "url",
@@ -30,17 +30,23 @@ const ProductCreateEdit = (props: Props) => {
     },
   ];
 
-  const handleSubmit = async (values: any, actions: any) => {
+  const { mutate, error } = trpc.user.signup.useMutation({
+    onSuccess: ({ message }) => {
+      alert(message);
+    },
+  });
+
+  const handleSubmit = async (values: CreateUserInput, actions: any) => {
+    mutate(values);
     actions.setSubmitting(false);
+    // router.push("/login");
   };
+
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Signup</h1>
-      <Forms
-        formFields={formFields}
-        handleSubmit={handleSubmit}
-        // initialValues={{ product_ids: "3645,3643", description: "" }}
-      />
+      <p className="text-red-600">{error && error?.message}</p>
+      <Forms formFields={formFields} handleSubmit={handleSubmit} />
     </div>
   );
 };

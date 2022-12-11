@@ -1,11 +1,19 @@
 import Forms from "@/components/Forms";
+import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
+import { LoginInput } from "@/server/schema/user.schema";
 
 type Props = {};
 
 const ProductCreateEdit = (props: Props) => {
-  const [jsonView, setjsonView] = useState({});
-  // URL, username, and a randomly generated password.
+  const { error, mutate } = trpc.user.login.useMutation({
+    onSuccess: (data) => {
+      if (data?.success) {
+        alert("login success");
+      }
+    },
+  });
+
   const formFields = [
     {
       name: "username",
@@ -23,14 +31,16 @@ const ProductCreateEdit = (props: Props) => {
     },
   ];
 
-  const handleSubmit = async (values: any, actions: any) => {
-    console.log(values);
+  const handleSubmit = async (values: LoginInput, actions: any) => {
+    mutate(values);
 
     actions.setSubmitting(false);
   };
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Login</h1>
+      <p className="text-red-600">{error && error?.message}</p>
+
       <Forms
         formFields={formFields}
         handleSubmit={handleSubmit}
