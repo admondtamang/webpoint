@@ -1,17 +1,20 @@
 import Forms from "@/components/Forms";
 import { CreateUserInput } from "@/server/schema/user.schema";
 import { trpc } from "@/utils/trpc";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 const ProductCreateEdit = () => {
+  const router = useRouter();
+
   const formFields = [
-    {
-      name: "url",
-      label: "URL",
-      type: "InputField",
-      placeholder: "Enter Url",
-      isRequired: true,
-    },
+    // {
+    //   name: "url",
+    //   label: "URL",
+    //   type: "InputField",
+    //   placeholder: "Enter Url",
+    //   isRequired: true,
+    // },
     {
       name: "username",
       label: "Username",
@@ -37,7 +40,7 @@ const ProductCreateEdit = () => {
   const handleSubmit = async (values: CreateUserInput, actions: any) => {
     mutate(values);
     actions.setSubmitting(false);
-    // router.push("/login");
+    router.push("/login");
   };
 
   return (

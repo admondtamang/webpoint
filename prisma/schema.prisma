@@ -39,14 +39,27 @@ model Account {
 model User {
   id            String    @id @default(cuid())
   username          String? @unique
-  url String
+  url String?
   password String
   createdAt DateTime @default(  now())
   updatedAt DateTime? @updatedAt
   sessions Session[]
   accounts      Account[]
+  passwordList PasswordList[]
+}
+
+model PasswordList {
+  id            String    @id @default(cuid())
+  username          String?
+  url String
+  password String
+  createdAt DateTime @default(  now())
+  updatedAt DateTime? @updatedAt
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
+
 
 model Session {
   id           String   @id @default(cuid())

@@ -8,10 +8,15 @@ export default function Forms({
   initialValues,
   handleSubmit,
   children,
+  ...rest
 }: any) {
   return (
     <div>
-      <Formik initialValues={initialValues || {}} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={initialValues || {}}
+        onSubmit={handleSubmit}
+        {...rest}
+      >
         {(props: any) => (
           <Form
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}

@@ -40,23 +40,22 @@ const ProductCreateEdit = () => {
   const handleSubmit = async (values: LoginInput, actions: any) => {
     // mutate(values);
 
-    await signIn("credentials", { ...values, redirect: false });
-    actions.setSubmitting(false);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("username", values.username);
+    const success = await signIn("credentials", { ...values, redirect: false });
+
+    if (success?.error == null) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("username", values.username);
+        router.push("/dashboard");
+      }
     }
-    router.push("/dashboard");
+    actions.setSubmitting(false);
   };
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Login</h1>
       {/* <p className="text-red-600">{error && error?.message}</p> */}
 
-      <Forms
-        formFields={formFields}
-        handleSubmit={handleSubmit}
-        initialValues={{ username: "ram", password: "ram" }}
-      />
+      <Forms formFields={formFields} handleSubmit={handleSubmit} />
     </div>
   );
 };
