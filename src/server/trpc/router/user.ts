@@ -7,35 +7,11 @@ import { genHash } from "@/utils/hash";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { TRPCError } from "@trpc/server";
 import argon2 from "argon2";
+import jwt from "jsonwebtoken";
 
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 
 export const userRouter = router({
-  getAll: publicProcedure.input(getAllSchema).query(async ({ input, ctx }) => {
-    console.log(input.uniqueUserName);
-    const user = await ctx.prisma.user.findFirst({
-      where: { username: input.uniqueUserName },
-    });
-    console.log(user);
-
-    if (!user)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "account not found",
-      });
-
-    const data = await ctx.prisma.passwordList.findMany({
-      where: {
-        userId: user.id,
-        url: {
-          contains: input.url,
-        },
-      },
-      take: 10,
-    });
-
-    return data;
-  }),
   login: publicProcedure.input(loginSchema).mutation(async ({ input, ctx }) => {
     const { username, password } = input;
 
@@ -49,8 +25,7 @@ export const userRouter = router({
         message: "account not found",
       });
 
-    const hashed = await genHash(password);
-    const verifyHash = await argon2.verify(user.password, hashed);
+    const verifyHash = await argon2.verify(user.password, password);
 
     if (!verifyHash)
       throw new TRPCError({
@@ -58,59 +33,22 @@ export const userRouter = router({
         message: "account or password not found",
       });
 
+    // generate token
+    const token = await jwt.sign(
+      {
+        user,
+        exp: (Date.now() / 1000 + (3000 || 300) * 60, 10),
+      },
+      "JWT_SECRET"
+    );
+
     return {
       success: true,
+      token,
+      user,
       message: `Hello ${input?.username ?? "world"}`,
     };
   }),
-
-  addPasswordList: publicProcedure
-    .input(createUserSchema) // input validation
-    .mutation(async ({ input, ctx }) => {
-      const { uniqueUserName, username, password, url } = input;
-
-      const user = await ctx.prisma.user.findFirst({
-        where: {
-          username: uniqueUserName,
-        },
-      });
-
-      if (!user) {
-        throw new TRPCError({ code: "CONFLICT" });
-      }
-
-      console.log(user);
-
-      // create user
-      try {
-        const passwordList = await ctx.prisma.passwordList.create({
-          data: {
-            username: user.username,
-            password,
-            userId: user.id,
-            url: url || "",
-          },
-        });
-
-        return {
-          passwordList,
-          message: "URl created",
-        };
-      } catch (e) {
-        console.log(e);
-        if (e instanceof PrismaClientKnownRequestError)
-          if (e.code === "P2002") {
-            throw new TRPCError({
-              cause: e,
-              code: "CONFLICT",
-              message: "User already Exists",
-            });
-          }
-        // Another error occured
-        console.error(e);
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-    }),
 
   signup: publicProcedure
     .input(createUserSchema) // input validation

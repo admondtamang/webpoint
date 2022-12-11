@@ -3,9 +3,11 @@ import { CreateUserInput } from "@/server/schema/user.schema";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useToast } from "@chakra-ui/react";
 
 const ProductCreateEdit = () => {
   const router = useRouter();
+  const toast = useToast();
 
   const formFields = [
     // {
@@ -33,14 +35,30 @@ const ProductCreateEdit = () => {
 
   const { mutate, error } = trpc.user.signup.useMutation({
     onSuccess: ({ message }) => {
-      alert(message);
+      toast({
+        title: "signup.",
+        description: message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      router.push("/login");
+    },
+    onError: ({ message }) => {
+      toast({
+        title: "signup.",
+        description: message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
     },
   });
 
   const handleSubmit = async (values: CreateUserInput, actions: any) => {
-    mutate(values);
+    const data = await mutate(values);
+
     actions.setSubmitting(false);
-    router.push("/login");
   };
 
   return (

@@ -15,6 +15,7 @@ export default function CustomFields({ fields }: any) {
             placeholder={field.placeholder}
             isRequired={field.placeholder}
             key={field.index}
+            {...field}
           />
         );
       case InputTypes.TextAreaField:

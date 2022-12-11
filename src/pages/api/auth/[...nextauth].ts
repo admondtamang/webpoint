@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-
+import DiscordProvider from "next-auth/providers/discord";
 import { prisma } from "../../../server/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { TRPCError } from "@trpc/server";
@@ -14,12 +14,29 @@ export const authOptions: NextAuthOptions = {
     signIn: "/signin",
     error: "/signin",
   },
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
-  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async session({ session, user }) {
+      console.log(session, user, "sdklsdfklsdf");
+
+      if (session.user) {
+        console.log("send", session);
+
+        session.user.id = user.id;
+      }
+      return session;
+    },
+  },
+  // session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
+  // secret: process.env.NEXTAUTH_SECRET,
 
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
+    DiscordProvider({
+      clientId: process.env.DISCORD_CLIENT_ID || "1051391387507109918",
+      clientSecret:
+        process.env.DISCORD_CLIENT_SECRET || "RpO4QtawM_teMlDiBd3DEQsCYjZFWdqW",
+    }),
     CredentialsProvider({
       type: "credentials",
       credentials: {},
@@ -50,26 +67,12 @@ export const authOptions: NextAuthOptions = {
           });
 
         if (!user) return null;
+        console.log(user);
 
         return user;
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    },
-    async session({ session, user }) {
-      console.log(session, user, "sdklsdfklsdf");
-
-      if (session.user) {
-        console.log("send", session);
-
-        session.user.id = user.id;
-      }
-      return session;
-    },
-  },
 };
 
 export default NextAuth(authOptions);

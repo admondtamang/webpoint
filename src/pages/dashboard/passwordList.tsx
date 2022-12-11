@@ -1,8 +1,10 @@
 import Forms from "@/components/Forms";
-import { CreateUserInput } from "@/server/schema/user.schema";
+import { CreateUserInput, createUserSchema } from "@/server/schema/user.schema";
 import { trpc } from "@/utils/trpc";
+import { useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { toFormikValidationSchema } from "zod-formik-adapter";
 
 const genRand = (len: number) => {
   return Math.random()
@@ -14,6 +16,7 @@ const PasswordList = () => {
   const [initialValues, setInitialValues] = useState({
     password: genRand(8) || "",
   });
+  const toast = useToast();
 
   const formFields = [
     {
@@ -39,20 +42,30 @@ const PasswordList = () => {
     },
   ];
 
-  const { mutate, error } = trpc.user.addPasswordList.useMutation({
+  const { mutate, error } = trpc.password.addPasswordList.useMutation({
     onSuccess: ({ message }) => {
-      alert(message);
+      toast({
+        title: "created.",
+        description: message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
     },
   });
 
-  const handleSubmit = async (values: CreateUserInput, actions: any) => {
+  const handleSubmit = async (
+    values: CreateUserInput,
+    { resetForm, setSubmitting }: any
+  ) => {
     let uniqueUserName = "";
     if (typeof window !== "undefined") {
       uniqueUserName = localStorage.getItem("username") || "";
     }
     setInitialValues({ password: genRand(8) });
     mutate({ ...values, uniqueUserName });
-    actions.setSubmitting(false);
+    resetForm({ values: "" });
+    setSubmitting(false);
   };
 
   const handleReset = () => {
@@ -66,6 +79,7 @@ const PasswordList = () => {
       <h1 className="mb-4 text-4xl">Add</h1>
       <p className="text-red-600">{error && error?.message}</p>
       <Forms
+        validationSchema={toFormikValidationSchema(createUserSchema)}
         formFields={formFields}
         initialValues={initialValues}
         handleSubmit={handleSubmit}

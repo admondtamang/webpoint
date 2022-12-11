@@ -37,16 +37,34 @@ model Account {
 }
 
 model User {
-  id            String    @id @default(cuid())
+    id            String    @id @default(cuid())
+    name          String?
   username          String? @unique
+    email         String?   @unique
+    emailVerified DateTime?
   url String?
-  password String
-  createdAt DateTime @default(  now())
+  password String?
+    image         String?
+      createdAt DateTime @default(  now())
   updatedAt DateTime? @updatedAt
-  sessions Session[]
-  accounts      Account[]
-  passwordList PasswordList[]
+      passwordList PasswordList[]
+    accounts      Account[]
+    sessions      Session[]
 }
+// model User {
+//   id            String    @id @default(cuid())
+//   username          String? @unique
+//   url String?
+//   password String
+//      email         String?   @unique
+//     emailVerified DateTime?
+//     image         String?
+//   createdAt DateTime @default(  now())
+//   updatedAt DateTime? @updatedAt
+//   sessions Session[]
+//   accounts      Account[]
+//   passwordList PasswordList[]
+// }
 
 model PasswordList {
   id            String    @id @default(cuid())

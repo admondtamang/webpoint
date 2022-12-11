@@ -14,31 +14,26 @@ import {
 import { trpc } from "@/utils/trpc";
 import Protected from "../protected";
 import { useRouter } from "next/router";
-import PasswordList from "../passwordList";
+import PasswordList from "./passwordList";
+import { signOut, useSession } from "next-auth/react";
+import { getloalStorage } from "@/utils/localstorage";
 
 export default function Dashboard() {
   const [url, setUrl] = useState("");
   const router = useRouter();
-
-  let username = "";
+  const username = getloalStorage("username");
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("username");
     }
-
     router.push("/");
+    signOut();
   };
 
-  if (typeof window !== "undefined") {
-    username = localStorage.getItem("username") || "";
-
-    if (!username) handleLogout();
-  }
-
-  const { data, error } = trpc.user.getAll.useQuery({
+  const { data, error } = trpc.password.getAll.useQuery({
     url,
-    uniqueUserName: username,
+    uniqueUserName: username || "",
   });
 
   const handleChange = (e: any) => {
