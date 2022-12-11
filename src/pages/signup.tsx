@@ -2,10 +2,8 @@ import Forms from "@/components/Forms";
 import { CreateUserInput } from "@/server/schema/user.schema";
 import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
-import Swal from "sweetalert2/dist/sweetalert2.js";
-type Props = {};
 
-const ProductCreateEdit = (props: Props) => {
+const ProductCreateEdit = () => {
   const formFields = [
     {
       name: "url",
@@ -44,7 +42,7 @@ const ProductCreateEdit = (props: Props) => {
 
   return (
     <div className="container m-auto mt-4">
-      <h1 className="mb-4 text-4xl">Signup</h1>
+      <h1 className="mb-4 text-4xl">Register</h1>
       <p className="text-red-600">{error && error?.message}</p>
       <Forms formFields={formFields} handleSubmit={handleSubmit} />
     </div>

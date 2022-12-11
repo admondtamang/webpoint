@@ -12,17 +12,25 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { trpc } from "@/utils/trpc";
+import Protected from "../protected";
 
 export default function Dashboard() {
   const [url, setUrl] = useState("");
+  let username = "";
+  if (typeof window !== "undefined") {
+    username = localStorage.getItem("username") || "";
+  }
+
   const { data, error } = trpc.user.getAll.useQuery({
     url,
+    username,
   });
 
   const handleChange = (e: any) => {
     setUrl(e.target.value);
   };
   return (
+    // <Protected>
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Dashboard</h1>
       <p className="text-red-600">{error && error?.message}</p>
@@ -50,5 +58,6 @@ export default function Dashboard() {
         </Table>
       </TableContainer>
     </div>
+    // </Protected>
   );
 }

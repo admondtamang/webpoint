@@ -2,17 +2,23 @@ import Forms from "@/components/Forms";
 import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
 import { LoginInput } from "@/server/schema/user.schema";
+import { signIn, useSession } from "next-auth/react";
+import { router } from "@/server/trpc/trpc";
+import { useRouter } from "next/router";
 
-type Props = {};
+const ProductCreateEdit = () => {
+  const { data } = useSession();
+  const router = useRouter();
 
-const ProductCreateEdit = (props: Props) => {
-  const { error, mutate } = trpc.user.login.useMutation({
-    onSuccess: (data) => {
-      if (data?.success) {
-        alert("login success");
-      }
-    },
-  });
+  // const { error, mutate } = trpc.user.login.useMutation({
+  //   onSuccess: (data) => {
+  //     if (data?.success) {
+  //       alert("login success");
+  //     }
+  //   },
+  // });
+
+  console.log(data, "session");
 
   const formFields = [
     {
@@ -32,19 +38,24 @@ const ProductCreateEdit = (props: Props) => {
   ];
 
   const handleSubmit = async (values: LoginInput, actions: any) => {
-    mutate(values);
+    // mutate(values);
 
+    await signIn("credentials", { ...values, redirect: false });
     actions.setSubmitting(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("username", values.username);
+    }
+    router.push("/dashboard");
   };
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Login</h1>
-      <p className="text-red-600">{error && error?.message}</p>
+      {/* <p className="text-red-600">{error && error?.message}</p> */}
 
       <Forms
         formFields={formFields}
         handleSubmit={handleSubmit}
-        // initialValues={{ product_ids: "3645,3643", description: "" }}
+        initialValues={{ username: "ram", password: "ram" }}
       />
     </div>
   );

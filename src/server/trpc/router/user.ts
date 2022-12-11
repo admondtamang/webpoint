@@ -12,20 +12,20 @@ import argon2 from "argon2";
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 
 export const userRouter = router({
-  getAll: protectedProcedure
-    .input(getAllSchema)
-    .query(async ({ input, ctx }) => {
-      const data = await ctx.prisma.user.findMany({
-        where: {
-          url: {
-            contains: input.url,
-          },
-        },
-        take: 10,
-      });
+  getAll: publicProcedure.input(getAllSchema).query(async ({ input, ctx }) => {
+    console.log("sdfka", input);
+    const data = await ctx.prisma.user.findMany({
+      where: {
+        username: input.username,
+        // url: {
+        //   contains: input.url,
+        // },
+      },
+      take: 10,
+    });
 
-      return data;
-    }),
+    return data;
+  }),
   login: publicProcedure.input(loginSchema).mutation(async ({ input, ctx }) => {
     const { username, password } = input;
 
@@ -60,7 +60,6 @@ export const userRouter = router({
 
       // generate password hash
       const hash = await genHash(password);
-      console.log(input);
 
       // create user
       try {

@@ -5,7 +5,7 @@ import TagsInput from "../FormComponents/ReactSelect";
 import TextAreaField from "../FormComponents/TextAreaField";
 
 export default function CustomFields({ fields }: any) {
-  function handleField(field: any, index: Number) {
+  function handleField(field: any, index: number) {
     switch (field.type) {
       case InputTypes.InputField:
         return (
@@ -62,6 +62,6 @@ export default function CustomFields({ fields }: any) {
   }
 
   return (
-    <>{fields.map((field: any, index: Number) => handleField(field, index))}</>
+    <>{fields.map((field: any, index: number) => handleField(field, index))}</>
   );
 }
