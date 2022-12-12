@@ -25,7 +25,7 @@ export const userRouter = router({
         message: "account not found",
       });
 
-    const verifyHash = await argon2.verify(user.password, password);
+    const verifyHash = await argon2.verify(user.password || "", password);
 
     if (!verifyHash)
       throw new TRPCError({
