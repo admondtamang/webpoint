@@ -52,18 +52,23 @@ const ProductCreateEdit = () => {
   const handleSubmit = async (values: LoginInput, actions: any) => {
     // mutate(values);
 
-    const result = await signIn("credentials", { ...values, redirect: false });
+    const status = await signIn("credentials", {
+      ...values,
+      redirect: false,
+      callbackUrl: "/dashboard",
+    });
+    console.log(status);
 
-    if (result?.error)
+    if (status?.error)
       return toast({
         title: "Login.",
-        description: result?.error,
+        description: status?.error,
         status: "error",
         duration: 9000,
         isClosable: true,
       });
 
-    if (result?.error == null) {
+    if (status?.error == null) {
       if (typeof window !== "undefined") {
         localStorage.setItem("username", values.username);
         router.push("/dashboard");
