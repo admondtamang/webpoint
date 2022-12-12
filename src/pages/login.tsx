@@ -77,6 +77,10 @@ const ProductCreateEdit = () => {
     actions.setSubmitting(false);
   };
 
+  const loginWithDiscord = () => {
+    signIn("discord", { redirect: true, callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="container m-auto mt-4">
       <h1 className="mb-4 text-4xl">Login</h1>
@@ -89,9 +93,7 @@ const ProductCreateEdit = () => {
         </div>
       ) : (
         <div>
-          <button onClick={() => signIn("discord", { redirect: true })}>
-            Login with Discord
-          </button>
+          <button onClick={loginWithDiscord}>Login with Discord</button>
         </div>
       )}
       <Forms formFields={formFields} handleSubmit={handleSubmit} />
